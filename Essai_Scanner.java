@@ -1,20 +1,30 @@
 import java.util.Scanner;
 import java.util.NoSuchElementException;
+import java.util.InputMismatchException;
 
 class Essai_Scanner {
     public static void main(String [] args) {
         Scanner my_scanner;
-        String ligne = null;
+        //String ligne = null;
+        int myInteger;
+        boolean isValidInteger = true;
 
         my_scanner = new Scanner(System.in);
-        System.out.println("Saisissez une ligne");
+        System.out.println("Saisissez un entier");
 
-        try {
-            ligne = my_scanner.nextLine();
-            System.out.println("Vous avez saisi la ligne : " + ligne);
-        } catch (NoSuchElementException e) {
-            System.err.println("Aucune ligne saisie");
-        } 
+        while (isValidInteger) {
+            try {
+                myInteger = my_scanner.nextInt();
+                isValidInteger = false;
+                System.out.println("Vous avez saisi l'entier : " + myInteger);
+            } catch (InputMismatchException e) {
+                System.err.println("Il faut saisir un entier !");
+                my_scanner.nextLine();
+            } catch (NoSuchElementException e) {
+                System.err.println("Aucune ligne saisie !");
+                break;
+            } 
+        }
 
         my_scanner.close();
     }
