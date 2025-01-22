@@ -6,8 +6,11 @@ class MainSeqTab {
     public static void main(String [] args) {
 
         Scanner myScanner = new Scanner(System.in);
-        SequenceTableau seq = new SequenceTableau();
         int element;
+
+        System.out.println("Donner la taille de la liste");
+        int tailleTableau = myScanner.nextInt();
+        SequenceTableau seq = new SequenceTableau(tailleTableau);
 
         while (true) {
             System.out.println("Entier a inserer en tete (-1 pour arreter): ");

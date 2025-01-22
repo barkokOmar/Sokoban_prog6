@@ -1,71 +1,97 @@
 
 class SequenceTableau {
 
-    int TAILLE_MAX;
-    int [] data;
-    int length = 0;
+    int capacity;
+    int[] elements;
+    int size = 0;
+	int headIndex = 0;
+	int tailIndex = 0;
+    boolean isFistInsert = true;
 
     public SequenceTableau() {
-        TAILLE_MAX = 100;
-        data = new int[TAILLE_MAX];
+        capacity = 100;
+        elements = new int[capacity];
+    }
+    public SequenceTableau(int capacity) {
+        this.capacity = capacity;
+        elements = new int[capacity];
     }
 
-    public SequenceTableau(int TAILLE_MAX) {
-        this.TAILLE_MAX = TAILLE_MAX;
-        data = new int[TAILLE_MAX];
-    }
 
     void insereTete(int element) {
         if (this.estRemplie()) {
-            throw new RuntimeException("Séquence remplie !");
+			// on va grossir dynamiquement le buffer en doublant la taille
         }
-        // on decale a droite tout les elements
-        this.decaleADroite();
-        data[0] = element;
-        length++;
+
+        System.out.println("Avant calcule : head="+headIndex+" tail="+tailIndex); // Debug
+
+        headIndex = this.getNextIndexForHeadInsert();
+        if (isFistInsert) {
+            tailIndex = headIndex;
+            isFistInsert = false;
+        }
+
+        System.out.println("Après calcule : head="+headIndex+" tail="+tailIndex); // Debug
+
+        elements[headIndex] = element;
+        size++;
+         
     }
 
     void insereQueue(int element) {
         if (this.estRemplie()) {
-            throw new RuntimeException("Séquence remplie !");
+			// on va grossir dynamiquement le buffer en doublant la taille
         }
-        data[length] = element;
-        length++;
+
+        System.out.println("Avant calcule : head="+headIndex+" tail="+tailIndex); // Debug
+
+        tailIndex = this.incrementRelativeIndex(tailIndex);
+        if (isFistInsert) {
+            headIndex = tailIndex;
+            isFistInsert = false;
+        }
+
+        System.out.println("Après calcule : head="+headIndex+" tail="+tailIndex); // Debug
+
+        elements[tailIndex] = element;
+        size++;
     }
 
     int extraitTete() {
         if (this.estVide())
             throw new RuntimeException("Séquence vide");
-        int retVal = data[0];
-        this.decaleAGauche();
-        length--;
+        int retVal = elements[headIndex];
+        headIndex = this.decrementRelativeIndex(headIndex);
+        size--;
         return retVal;
     }
 
     boolean estVide() {
-        return (0 == length);
+        return (0 == size);
     }
 
     boolean estRemplie() {
-        return TAILLE_MAX == length;
+        return capacity == size;
     }
 
-    void decaleADroite() {
-        for (int i = length - 1; i >= 0; i--) {
-            data[i+1] = data[i];
-        }
+    int getNextIndexForHeadInsert() {
+        return ((headIndex-1 + capacity) % capacity); 
     }
 
-    void decaleAGauche() {
-        for (int i = 0; i < length; i++) {
-            data[i] = data[i+1];
-        }
+    int incrementRelativeIndex(int index) {
+        return ((index+1) % capacity);
+    }
+
+    int decrementRelativeIndex(int index) {
+        return ((index+1) % capacity);
     }
 
     public String toString () {
         StringBuilder retVal = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            retVal.append(data[i]).append("->");
+        int tempHead = headIndex;
+        for (int i = 0; i < size; i++) {
+            retVal.append(elements[tempHead]).append("->");
+            tempHead = this.decrementRelativeIndex(tempHead);
         }
         retVal.append("null");
         return retVal.toString();
