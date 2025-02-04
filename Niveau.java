@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.NoSuchElementException;
 import java.util.InputMismatchException;
@@ -17,10 +18,9 @@ class RedacteurNiveau {
     public void ecrisNiveau(Niveau level) {
         for (char [] line : level.grille) {
             my_printer.println(line);
-            my_printer.println();
         }
-        my_printer.print(';');
-        my_printer.println(level.nom);
+        my_printer.println(';'+level.nom);
+        my_printer.println();
     }
 
     public void EndPrinting() {
@@ -47,36 +47,33 @@ class LecteurNiveaux {
             return null;
         }
 
-        StringBuilder levelParagraphe = new StringBuilder();
-        StringBuilder comments = new StringBuilder();
-        String line;
+        ArrayList<String> levelParagraphe = new ArrayList<>();
+        ArrayList<String> comments = new ArrayList<>();
 
-        // Lecture d'un paragraphe (suite de lignes/text se terminant par une ligne vide) designe un niveau
+        String line;
         while (my_scanner.hasNextLine()) {
             line = my_scanner.nextLine();
             if (line.isEmpty()) {
                 break;
             }
             if (IsComment(line))
-                comments.append(line);
+                comments.add(line);
             else
-                levelParagraphe.append(line);
+                levelParagraphe.add(line);
         }
 
-
         // Decoupe le paragraphe en lignes independantes 
-        String [] levelLines = levelParagraphe.toString().split("\\R");
-        String [] commentLines = comments.toString().split("\\R");
+        String [] levelLines = new String [levelParagraphe.size()];
+		levelLines = levelParagraphe.toArray(levelLines);
+        String [] commentLines = new String [comments.size()];
+		commentLines = comments.toArray(commentLines);
 
         // Exraire le dernier commentaire
         String lastComment;
         if (commentLines.length > 0)
-            lastComment = commentLines[commentLines.length - 1];
+            lastComment = commentLines[commentLines.length - 1].substring(1);
         else
             lastComment = "level_name_not_specified";
-
-        // Supprinme le ';'
-        lastComment = lastComment.substring(1);
 
         Niveau level = new Niveau(levelLines);
         level.fixeNom(lastComment);
@@ -104,6 +101,10 @@ public class Niveau {
 
     public Niveau() {
         // niveau vide
+    }
+	
+    public Niveau(int nombreDeLignes) {
+		grille = new char[nombreDeLignes][]; 
     }
 
     public Niveau(char [][] grille) {
@@ -144,10 +145,15 @@ public class Niveau {
     }        
 
     int lignes() {
-        return 0; 
+		return grille.length;
     }
+
     int colonnes() {
-        return 0; 
+		int retVal = 0;
+		for (char[] line : grille) {
+			if (line.length > retVal)
+				retVal = line.length;
+		}
     }
 
     String nom() {
@@ -155,20 +161,19 @@ public class Niveau {
     }                   
 
     boolean estVide(int l, int c) {
-        return true; 
+        return ' ' == grille[l][c]; 
     }  
-
     boolean aMur(int l, int c) {
-        return true; 
+        return '#' == grille[l][c]; 
     }
     boolean aBut(int l, int c) {
-        return true;
+        return '.' == grille[l][c];
     }
     boolean aPousseur(int l, int c) {
-        return true; 
+		return '@' == grille[l][c];
     }
     boolean aCaisse(int l, int c) {
-        return true; 
+		return '$' == grille[l][c];
     }  
 
 }
