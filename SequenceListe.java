@@ -1,18 +1,17 @@
 
+class IterateurSequenceListe implements Iterateur {
+	public boolean aProchain() {
+        return false;
+    }
+	public int prochain() {
+        return 0;
+    }
+	public void supprime() {
 
-class Cellule {
-
-    int valeur;
-    Cellule suivant;
-
-    public Cellule(int valeur) {
-        this.valeur = valeur;
-        suivant = null;
     }
 }
 
 class SequenceListe {
-
     Cellule head;
     Cellule tail;
     

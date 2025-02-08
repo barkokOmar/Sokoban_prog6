@@ -1,5 +1,17 @@
 
-class SequenceTableau {
+class IterateurSequenceTableau implements Iterateur {
+	public boolean aProchain() {
+        return false;
+    }
+	public int prochain() {
+        return 0;
+    }
+	public void supprime() {
+
+    }
+}
+
+public class SequenceTableau {
 
     int capacity = 1;
     int [] elements;
