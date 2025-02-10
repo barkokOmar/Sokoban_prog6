@@ -148,12 +148,14 @@ public class Niveau {
 		return grille.length;
     }
 
+	// Renvoie la taille de la colonnes la plus longue
     int colonnes() {
 		int retVal = 0;
 		for (char[] line : grille) {
 			if (line.length > retVal)
 				retVal = line.length;
 		}
+		return retVal;
     }
 
     String nom() {
