@@ -6,21 +6,21 @@ import java.io.*;
 class NiveauGraphique extends JComponent {
 	int counter;
 
-    Niveau level;
+    Jeu jeu;
 
     Image wallImage;
     Image playerImage;
     Image boxImage;
     Image boxOnGoalImage;
     Image goalImage;
-    Image groundImage;
+    Image floorImage;
 
     public NiveauGraphique() {
-        this.level = new Niveau();
+        this.jeu = new Jeu();
     }
 
-    public NiveauGraphique(Niveau level) {
-        this.level = level;
+    public NiveauGraphique(Jeu jeu) {
+        this.jeu = jeu;
     }
     
     // Charges the image which path is specified by imagePath and returns an image that can be used by Swing
@@ -55,14 +55,55 @@ class NiveauGraphique extends JComponent {
     public void chargeBut (String goalImagePath) {
         this.goalImage = chargeImage(goalImagePath);
     }
-    public void chargeSol (String groundImagePath) {
-        this.groundImage = chargeImage(groundImagePath);
+    public void chargeSol (String floorImagePath) {
+        this.floorImage = chargeImage(floorImagePath);
+    }
+    public boolean allElementImagesCharged() {
+        return (null != wallImage) &&
+               (null != playerImage) &&
+               (null != boxImage) &&
+               (null != boxOnGoalImage) &&
+               (null != goalImage) &&
+               (null != floorImage);
+    }
+
+    protected void paintElement(Graphics2D drawable, int l, int c, int x, int y, int width, int height) {
+        Niveau niveau = this.jeu.niveau;
+
+        if (niveau.estVide(l, c)) {
+            // Wait for image pixel to finish changing
+            while(!drawable.drawImage(floorImage, x, y, width, height, null)) {}
+
+        } else if (niveau.aMur(l, c)) {
+            while (!drawable.drawImage(wallImage, x, y, width, height, null)) {}
+
+        } else if (niveau.aBut(l, c)) {
+            while(!drawable.drawImage(goalImage, x, y, width, height, null)) {}
+
+        } else if (niveau.aPousseur(l, c)) {
+            while(!drawable.drawImage(playerImage, x, y, width, height, null)) {}
+
+        } else if (niveau.aCaisse(l, c)) {
+            while(!drawable.drawImage(boxImage, x, y, width, height, null)) {}
+
+        } else if (niveau.aCaisseSurBut(l, c)) {
+            while(!drawable.drawImage(boxOnGoalImage, x, y, width, height, null)) {}
+
+        } else {
+            throw new RuntimeException("Element a dessiner non recconue");
+        }
     }
 
 	@Override
 	public void paintComponent(Graphics g) {
         /*
-		System.out.println("Entree dans paintComponent : " + counter++);
+        */
+        if (!allElementImagesCharged()) {
+            throw new RuntimeException("Il faut charger toutes les images des elements de niveau avant !!");
+        }
+        Niveau niveau = jeu.niveau();
+        int lignesNiveau = niveau.lignes();
+        int colonnesNiveau = niveau.colonnes();
 
 		// Graphics 2D est le vrai type de l'objet passé en paramètre
 		// Le cast permet d'avoir acces a un peu plus de primitives de dessin
@@ -77,10 +118,17 @@ class NiveauGraphique extends JComponent {
 
 		// On efface tout
 		drawable.clearRect(0, 0, width, height);
+        
+        // On calcule quel sera la taille du rectangle de chaque element du Niveau
+        int widthImage = width / colonnesNiveau;
+        int heightImage = height / lignesNiveau;
 
-		// On affiche une petite image au milieu
-		drawable.drawImage(img, center.x-20, center.y-20, 40, 40, null);
-        */
+        // On affiche (dessine) element par element
+        for (int i = 0; i < lignesNiveau; i++) {
+            for (int j = 0; j < niveau.grille[i].length; j++) {
+                paintElement(drawable, i, j, i*widthImage, j*heightImage, widthImage, heightImage);
+            }
+        }
 	}
 
 }

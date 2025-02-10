@@ -1,7 +1,7 @@
 
 public class Jeu {
 	LecteurNiveaux levelReader;
-	Niveau level;
+	Niveau niveau;
 
 	public Jeu() {
 
@@ -13,13 +13,13 @@ public class Jeu {
 
 	// Returns current level
 	Niveau niveau() {
-		return level;
+		return niveau;
 	}
 
-	// Advances to the next level, 
+	// Advances to the next level, return true upon successful reading
 	boolean prochainNiveau() {
-		this.level = levelReader.lisProchainNiveau();
-		return null != this.level;
+		this.niveau = levelReader.lisProchainNiveau();
+		return null != this.niveau;
 	}
 
 }
