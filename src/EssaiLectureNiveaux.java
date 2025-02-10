@@ -8,13 +8,13 @@ import java.io.FileNotFoundException;
 import java.util.List; 
 import java.util.ArrayList; 
 
-class Main {
+class EssaiLectureNiveaux {
     public static void main(String [] args) {
         InputStream inputStream;
         OutputStream outputStream = System.out;
 
         if (args.length < 1) {
-            throw new RuntimeException("Il faut donner un fichier avec les niveaux !!!");
+            throw new RuntimeException("Il faut donner en argument un fichier niveaux !");
         }
 
         try {
@@ -38,5 +38,6 @@ class Main {
         lecteur.endReading();
     }
 }
+
 
 
