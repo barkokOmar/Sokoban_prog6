@@ -4,8 +4,6 @@ import java.awt.*;
 import java.io.*;
 
 class NiveauGraphique extends JComponent {
-	int counter;
-
     Jeu jeu;
 
     Image wallImage;
@@ -36,14 +34,13 @@ class NiveauGraphique extends JComponent {
 			System.err.println("ERREUR : impossible de charger l'image <"+imagePath+">");
 			System.exit(3);
 		}
-		counter = 1;
         return img;
 	}
 
     public void chargeMure (String wallImagePath) {
         this.wallImage = chargeImage(wallImagePath);
     }
-    public void chargeJoueur (String playerImagePath) {
+    public void chargePousseur (String playerImagePath) {
         this.playerImage = chargeImage(playerImagePath);
     }
     public void chargeCaisse (String boxImagePath) {
@@ -68,10 +65,10 @@ class NiveauGraphique extends JComponent {
     }
 
     protected void paintElement(Graphics2D drawable, int l, int c, int x, int y, int width, int height) {
-        Niveau niveau = this.jeu.niveau;
+        Niveau niveau = this.jeu.niveau();
 
         if (niveau.estVide(l, c)) {
-            // Wait for image pixel to finish changing
+            // Waits for image pixels to finish changing
             while(!drawable.drawImage(floorImage, x, y, width, height, null)) {}
 
         } else if (niveau.aMur(l, c)) {
@@ -80,7 +77,8 @@ class NiveauGraphique extends JComponent {
         } else if (niveau.aBut(l, c)) {
             while(!drawable.drawImage(goalImage, x, y, width, height, null)) {}
 
-        } else if (niveau.aPousseur(l, c)) {
+        } else if (niveau.aPousseur(l, c)) { // On charge le floor puis le joueur dessus
+            while(!drawable.drawImage(floorImage, x, y, width, height, null)) {}
             while(!drawable.drawImage(playerImage, x, y, width, height, null)) {}
 
         } else if (niveau.aCaisse(l, c)) {
@@ -126,7 +124,7 @@ class NiveauGraphique extends JComponent {
         // On affiche (dessine) element par element
         for (int i = 0; i < lignesNiveau; i++) {
             for (int j = 0; j < niveau.grille[i].length; j++) {
-                paintElement(drawable, i, j, i*widthImage, j*heightImage, widthImage, heightImage);
+                paintElement(drawable, i, j, j*widthImage, i*heightImage, widthImage, heightImage);
             }
         }
 	}

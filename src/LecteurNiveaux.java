@@ -18,6 +18,7 @@ class LecteurNiveaux {
     
     public Niveau lisProchainNiveau() {
         if (!my_scanner.hasNextLine()) { // Fin du flux atteinte
+            System.out.println("Fin fichier niveaux atteinte.");
             endReading();
             return null;
         }

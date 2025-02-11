@@ -1,25 +1,26 @@
 
 public class Jeu {
-	LecteurNiveaux levelReader;
-	Niveau niveau;
+
+	LecteurNiveaux lecteur;
+	Niveau niveauCourant;
 
 	public Jeu() {
 
 	}
 
 	public Jeu(LecteurNiveaux levelReader) {
-		this.levelReader = levelReader;
+		this.lecteur = levelReader;
 	}
 
 	// Returns current level
 	Niveau niveau() {
-		return niveau;
+		return niveauCourant;
 	}
 
 	// Advances to the next level, return true upon successful reading
 	boolean prochainNiveau() {
-		this.niveau = levelReader.lisProchainNiveau();
-		return null != this.niveau;
+		this.niveauCourant = lecteur.lisProchainNiveau();
+		return null != this.niveauCourant;
 	}
 
 }
