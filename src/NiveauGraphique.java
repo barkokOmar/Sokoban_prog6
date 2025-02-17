@@ -2,10 +2,10 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import Global.Configuration;
 
 class NiveauGraphique extends JComponent {
     Jeu jeu;
-
     Image wallImage;
     Image playerImage;
     Image boxImage;
@@ -24,12 +24,11 @@ class NiveauGraphique extends JComponent {
     // Charges the image which path is specified by imagePath and returns an image that can be used by Swing
 	public Image chargeImage(String imagePath) {
         Image img = null;
+        Configuration config = new Configuration();
+        InputStream in = config.ouvre(imagePath);
+
 		try {
-			InputStream in = new FileInputStream(imagePath);
 			img = ImageIO.read(in);
-		} catch (FileNotFoundException e) {
-			System.err.println("ERREUR : impossible de trouver le fichier image <"+imagePath+">");
-			System.exit(2);
 		} catch (IOException e) {
 			System.err.println("ERREUR : impossible de charger l'image <"+imagePath+">");
 			System.exit(3);
@@ -88,7 +87,7 @@ class NiveauGraphique extends JComponent {
             while(!drawable.drawImage(boxOnGoalImage, x, y, width, height, null)) {}
 
         } else {
-            throw new RuntimeException("Element a dessiner non recconue");
+            throw new RuntimeException("Element '"+niveau.getElement(l, c)+"' a dessiner non recconue");
         }
     }
 
@@ -97,7 +96,7 @@ class NiveauGraphique extends JComponent {
         /*
         */
         if (!allElementImagesCharged()) {
-            throw new RuntimeException("Il faut charger toutes les images des elements de niveau avant !!");
+            throw new RuntimeException("Il faut charger toutes les images des elements de niveau avant de l'afficher !!");
         }
         Niveau niveau = jeu.niveau();
         int lignesNiveau = niveau.lignes();
@@ -123,10 +122,8 @@ class NiveauGraphique extends JComponent {
 
         // On affiche (dessine) element par element
         for (int i = 0; i < lignesNiveau; i++) {
-            for (int j = 0; j < niveau.grille[i].length; j++) {
+            for (int j = 0; j < niveau.grille[i].length; j++)
                 paintElement(drawable, i, j, j*widthImage, i*heightImage, widthImage, heightImage);
-            }
         }
 	}
-
 }

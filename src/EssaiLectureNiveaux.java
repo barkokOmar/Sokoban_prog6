@@ -7,21 +7,19 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List; 
 import java.util.ArrayList; 
+import Global.Configuration;
 
 class EssaiLectureNiveaux {
     public static void main(String [] args) {
         InputStream inputStream;
         OutputStream outputStream = System.out;
+        Configuration config = new Configuration();
 
         if (args.length < 1) {
             throw new RuntimeException("Il faut donner en argument un fichier niveaux !");
         }
 
-        try {
-            inputStream = new FileInputStream(args[0]);
-        } catch (FileNotFoundException  e) {
-            throw new RuntimeException("Erreur durant ouverture du fichier "+ args[0]);
-        }
+        inputStream = config.ouvre(args[0]);
 
         Niveau level;
         List<Niveau> listeDesNiveaux = new ArrayList<>();
