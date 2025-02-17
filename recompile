@@ -2,10 +2,7 @@
 
 
 echo "compiling..."
-
-temp_file=$(mktemp) #chemin ver fichier temporaire
-find src -name "*.java" > $temp_file
-javac -d bin @${temp_file}
-rm $temp_file
-
+#javac -cp bin -d bin $(find ./src/* | grep .java)
+javac $(find ./src/* | grep .java)
 echo "done"
+

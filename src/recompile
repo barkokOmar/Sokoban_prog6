@@ -1,0 +1,7 @@
+#!/bin/bash
+
+rm *.class 2>/dev/null
+echo "compiling..."
+javac --release 13 *.java
+javac --release 13 Global/*.java
+echo "done"
