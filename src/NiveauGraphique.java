@@ -12,6 +12,7 @@ class NiveauGraphique extends JComponent {
     Image boxOnGoalImage;
     Image goalImage;
     Image floorImage;
+    Point position;
 
     public NiveauGraphique() {
         this.jeu = new Jeu();
@@ -63,6 +64,11 @@ class NiveauGraphique extends JComponent {
                (null != floorImage);
     }
 
+	public void fixePosition(int x, int y) {
+        position.x = x;
+        position.y = y;
+    }
+
     protected void paintElement(Graphics2D drawable, int l, int c, int x, int y, int width, int height) {
         Niveau niveau = this.jeu.niveau();
 
@@ -93,10 +99,8 @@ class NiveauGraphique extends JComponent {
 
 	@Override
 	public void paintComponent(Graphics g) {
-        /*
-        */
         if (!allElementImagesCharged()) {
-            throw new RuntimeException("Il faut charger toutes les images des elements de niveau avant de l'afficher !!");
+            throw new RuntimeException("Il faut charger toutes les images des elements de niveau avant d'afficher le niveau !");
         }
         Niveau niveau = jeu.niveau();
         int lignesNiveau = niveau.lignes();
@@ -120,10 +124,19 @@ class NiveauGraphique extends JComponent {
         int widthImage = width / colonnesNiveau;
         int heightImage = height / lignesNiveau;
 
-        // On affiche (dessine) element par element
+        // On dessine la grille
         for (int i = 0; i < lignesNiveau; i++) {
-            for (int j = 0; j < niveau.grille[i].length; j++)
+            for (int j = 0; j < niveau.grille[i].length; j++) {
                 paintElement(drawable, i, j, j*widthImage, i*heightImage, widthImage, heightImage);
+            }
         }
+
+        
+        if (null != position) {
+            int i = (int)position.getX();
+            int j = (int)position.getY();
+            paintElement(drawable, i, j, j*widthImage, i*heightImage, widthImage, heightImage);
+        } // A finiiiiiiiiiiiiiiir
+
 	}
 }

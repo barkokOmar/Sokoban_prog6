@@ -3,10 +3,9 @@ import java.awt.GraphicsEnvironment;
 import java.awt.GraphicsDevice;
 
 
-
 // L'interface runnable déclare une méthode run
 public class InterfaceGraphique implements Runnable {
-	boolean maximized = false;
+	boolean maximized;
 	Jeu jeu;
 
 	public InterfaceGraphique(Jeu jeu) {
@@ -46,6 +45,11 @@ public class InterfaceGraphique implements Runnable {
 
 		// Ajout de notre composant de dessin dans la fenetre
 		frame.add(niveauGraphique);
+		
+		EcouteurDeSouris mouseListener = new EcouteurDeSouris(niveauGraphique);
+
+		// Ajout d'un mouse listener
+		niveauGraphique.addMouseListener(mouseListener);
 
 		// Un clic sur le bouton de fermeture clos l'application
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -53,8 +57,13 @@ public class InterfaceGraphique implements Runnable {
 		// On set l'icone de la fenetere
 		frame.setIconImage(niveauGraphique.playerImage);
 
+		// Set window size 
+		frame.setSize(500, 300);
+
+		/*
 		// Plein Ecran
 		toggleFullscreen(frame);
+		*/
 
 		// On fixe la taille et on demarre
 		frame.setVisible(true);

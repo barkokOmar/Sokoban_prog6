@@ -25,15 +25,16 @@
  *          38401 Saint Martin d'Hères
  */
 
+import java.awt.*;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.*;
-import java.io.InputStream;
-import java.io.FileInputStream;
 
 class AireDeDessin extends JComponent {
 	int counter;
 	Image img;
+	Point position;
 
 	public AireDeDessin() {
 		// Chargement de l'image de la même manière que le fichier de niveaux
@@ -66,7 +67,12 @@ class AireDeDessin extends JComponent {
 		// On efface tout
 		drawable.clearRect(0, 0, width, height);
 
-		// On affiche une petite image au milieu
-		drawable.drawImage(img, center.x-20, center.y-20, 40, 40, null);
+		if (null != position) {
+			// On afficher l'image a la position donnee
+			drawable.drawImage(img, position.x-20, position.y-20, 40, 40, null);
+		} else {
+			// On affiche une petite image au milieu si 
+			drawable.drawImage(img, center.x-20, center.y-20, 40, 40, null);
+		}
 	}
 }

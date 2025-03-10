@@ -29,16 +29,22 @@ import javax.swing.*;
 
 // L'interface runnable déclare une méthode run
 public class DemoFenetre implements Runnable {
+
+	AireDeDessin aire;
+
 	public void run() {
 		// Creation d'une fenetre
 		JFrame frame = new JFrame("Ma fenetre a moi");
 
+		
 		// Ajout de notre composant de dessin dans la fenetre
-		AireDeDessin aire = new AireDeDessin();
+		aire = new AireDeDessin();
+		
+
 		frame.add(aire);
 
 		// Ecoute des évènements liés à la souris dans l'AireDeDessin
-		aire.addMouseListener(new EcouteurDeSouris());
+		aire.addMouseListener(new EcouteurDeSouris(aire));
 
 		// Un clic sur le bouton de fermeture clos l'application
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

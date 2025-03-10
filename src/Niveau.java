@@ -74,8 +74,12 @@ public class Niveau {
         return this.nom; 
     }                   
 
+    boolean estCaseValide(int l, int c) {
+        return (l>=0 && c>=0) && (l<grille.length && c<grille[l].length);
+    }
+
     char getElement(int l, int c) {
-        if (l >= grille.length || c >= grille[l].length) {
+        if (!estCaseValide(l, c)) {
             throw new RuntimeException("Indices d'acces a une case du niveau invalides !");
         }
         return grille[l][c];
