@@ -22,7 +22,7 @@ public class EcouteurDeSouris extends MouseAdapter {
 	public void mousePressed(MouseEvent e) {
 		if (null != niveauGraphique) {
 			System.out.println("Le bouton de la souris a été pressé en (" + e.getX() + ", " + e.getY() + ")");
-			niveauGraphique.fixePosition(e.getX(), e.getY());
+			niveauGraphique.fixePositionDeDeplacement(e.getX(), e.getY());
 			niveauGraphique.repaint();
 		} else if (null != aire) {
 			System.out.println("Le bouton de la souris a été pressé en (" + e.getX() + ", " + e.getY() + ")");

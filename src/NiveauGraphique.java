@@ -12,7 +12,7 @@ class NiveauGraphique extends JComponent {
     Image boxOnGoalImage;
     Image goalImage;
     Image floorImage;
-    Point position;
+    Point positionDeDeplacement;
 
     public NiveauGraphique() {
         this.jeu = new Jeu();
@@ -64,10 +64,9 @@ class NiveauGraphique extends JComponent {
                (null != floorImage);
     }
 
-	public void fixePosition(int x, int y) {
-        position.x = x;
-        position.y = y;
-    }
+	public void fixePositionDeDeplacement(int x, int y) {
+		this.positionDeDeplacement = new Point(x, y);
+	}
 
     protected void paintElement(Graphics2D drawable, int l, int c, int x, int y, int width, int height) {
         Niveau niveau = this.jeu.niveau();
@@ -80,6 +79,7 @@ class NiveauGraphique extends JComponent {
             while (!drawable.drawImage(wallImage, x, y, width, height, null)) {}
 
         } else if (niveau.aBut(l, c)) {
+            while(!drawable.drawImage(floorImage, x, y, width, height, null)) {}
             while(!drawable.drawImage(goalImage, x, y, width, height, null)) {}
 
         } else if (niveau.aPousseur(l, c)) { // On charge le floor puis le joueur dessus
@@ -92,11 +92,44 @@ class NiveauGraphique extends JComponent {
         } else if (niveau.aCaisseSurBut(l, c)) {
             while(!drawable.drawImage(boxOnGoalImage, x, y, width, height, null)) {}
 
-        } else {
+		} else if (niveau.aPousseurSurBut(l, c)) {
+            while(!drawable.drawImage(floorImage, x, y, width, height, null)) {}
+			while(!drawable.drawImage(goalImage, x, y, width, height, null)) {}
+			while(!drawable.drawImage(playerImage, x, y, width, height, null)) {}
+
+		} else {
             throw new RuntimeException("Element '"+niveau.getElement(l, c)+"' a dessiner non recconue");
         }
     }
 
+    private void realiseDeplacementDansNiveau(Niveau niveau) {
+        int x = this.positionDeDeplacement.x;
+        int y = this.positionDeDeplacement.y;
+        int xJoueur = niveau.positionJoueur().x;
+        int yJoueur = niveau.positionJoueur().y;
+        int dx = x - xJoueur;
+        int dy = y - yJoueur;
+        int xCaisse = x + dx;
+        int yCaisse = y + dy;
+
+        if (!estCaseAdjacente(x, y, xJoueur, yJoueur)) {
+            throw new RuntimeException("Le joueur ne peut se deplacer que d'une case a la fois !");
+        }
+        if (niveau.aCaisse(x, y) && (niveau.estVide(xCaisse, yCaisse) || niveau.aBut(xCaisse, yCaisse)) ) {
+            niveau.deplaceCaisse(x, y, xCaisse, yCaisse);
+        }
+		if (niveau.estVide(x, y) || niveau.aBut(x, y)) {	// Si jamais y avait une caisse sur la nouvelle position du joueur, elle a déjà été déplacée (effet de bord de deplaceCaisse) et l'enciennne position de la caisse sera donc vide
+            niveau.deplaceJoueur(x, y);
+        } else {
+            throw new RuntimeException("Mouvement non valide !");
+        }
+		this.positionDeDeplacement = null;
+    }
+
+    private boolean estCaseAdjacente(int x1, int y1, int x2, int y2) {
+        return (Math.abs(x1 - x2) == 1 && y1 == y2) || (Math.abs(y1 - y2) == 1 && x1 == x2);
+    }
+    
 	@Override
 	public void paintComponent(Graphics g) {
         if (!allElementImagesCharged()) {
@@ -115,7 +148,7 @@ class NiveauGraphique extends JComponent {
 		int height = getSize().height;
 
 		// On calcule le centre de la zone et un rayon
-		Point center = new Point(width/2, height/2);
+		//Point center = new Point(width/2, height/2);
 
 		// On efface tout
 		drawable.clearRect(0, 0, width, height);
@@ -124,19 +157,16 @@ class NiveauGraphique extends JComponent {
         int widthImage = width / colonnesNiveau;
         int heightImage = height / lignesNiveau;
 
+		// Un click est detectee
+		if (null != positionDeDeplacement)
+			realiseDeplacementDansNiveau(niveau);
+
         // On dessine la grille
         for (int i = 0; i < lignesNiveau; i++) {
             for (int j = 0; j < niveau.grille[i].length; j++) {
                 paintElement(drawable, i, j, j*widthImage, i*heightImage, widthImage, heightImage);
             }
         }
-
         
-        if (null != position) {
-            int i = (int)position.getX();
-            int j = (int)position.getY();
-            paintElement(drawable, i, j, j*widthImage, i*heightImage, widthImage, heightImage);
-        } // A finiiiiiiiiiiiiiiir
-
 	}
 }
