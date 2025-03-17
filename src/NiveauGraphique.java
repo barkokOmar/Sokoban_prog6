@@ -1,8 +1,8 @@
-import javax.imageio.ImageIO;
-import javax.swing.*;
+import Global.Configuration;
 import java.awt.*;
 import java.io.*;
-import Global.Configuration;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 
 class NiveauGraphique extends JComponent {
     Jeu jeu;
@@ -102,9 +102,9 @@ class NiveauGraphique extends JComponent {
         }
     }
 
-    private void realiseDeplacementDansNiveau(Niveau niveau) {
-        int x = this.positionDeDeplacement.x;
-        int y = this.positionDeDeplacement.y;
+    private void realiseDeplacementDansNiveau(Niveau niveau, int ImageWidth, int ImageHeight) {
+        int x = this.positionDeDeplacement.x / ImageHeight;
+        int y = this.positionDeDeplacement.y / ImageWidth;
         int xJoueur = niveau.positionJoueur().x;
         int yJoueur = niveau.positionJoueur().y;
         int dx = x - xJoueur;
@@ -113,7 +113,7 @@ class NiveauGraphique extends JComponent {
         int yCaisse = y + dy;
 
         if (!estCaseAdjacente(x, y, xJoueur, yJoueur)) {
-            throw new RuntimeException("Le joueur ne peut se deplacer que d'une case a la fois !");
+            System.out.println("Le joueur ne peut se deplacer que d'une case a la fois !");
         }
         if (niveau.aCaisse(x, y) && (niveau.estVide(xCaisse, yCaisse) || niveau.aBut(xCaisse, yCaisse)) ) {
             niveau.deplaceCaisse(x, y, xCaisse, yCaisse);
@@ -121,13 +121,13 @@ class NiveauGraphique extends JComponent {
 		if (niveau.estVide(x, y) || niveau.aBut(x, y)) {	// Si jamais y avait une caisse sur la nouvelle position du joueur, elle a déjà été déplacée (effet de bord de deplaceCaisse) et l'enciennne position de la caisse sera donc vide
             niveau.deplaceJoueur(x, y);
         } else {
-            throw new RuntimeException("Mouvement non valide !");
+            System.out.println("Mouvement invalide !");
         }
 		this.positionDeDeplacement = null;
     }
 
     private boolean estCaseAdjacente(int x1, int y1, int x2, int y2) {
-        return (Math.abs(x1 - x2) == 1 && y1 == y2) || (Math.abs(y1 - y2) == 1 && x1 == x2);
+        return (Math.abs(x1 - x2) < 1 && y1 == y2) || (Math.abs(y1 - y2) == 1 && x1 == x2);
     }
     
 	@Override
@@ -159,7 +159,9 @@ class NiveauGraphique extends JComponent {
 
 		// Un click est detectee
 		if (null != positionDeDeplacement)
-			realiseDeplacementDansNiveau(niveau);
+			realiseDeplacementDansNiveau(niveau, widthImage, heightImage);
+        positionDeDeplacement = null;
+    
 
         // On dessine la grille
         for (int i = 0; i < lignesNiveau; i++) {

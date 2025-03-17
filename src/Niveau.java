@@ -28,7 +28,7 @@ public class Niveau {
         for (int i = 0; i < grille.length; i++) {
             p = ContainsPlayer(new String(grille[i]));
             if (null != p) {
-                fixePositionJoueur(p);
+                this.positionJoueur = new Point(p);
             }
         }
         setNbColonnes();
@@ -42,7 +42,7 @@ public class Niveau {
             this.grille[i] = line.toCharArray();
             p = ContainsPlayer(line);
             if (null != p) {
-                fixePositionJoueur(p);
+                this.positionJoueur = new Point(p);
             }
             i++;
         }
@@ -51,7 +51,7 @@ public class Niveau {
         setNbColonnes();
     }
 
-    protected void setNbColonnes() {
+    private void setNbColonnes() {
 		this.colonnes = 0;
 		for (char[] line : grille) {
 			if (line.length > this.colonnes)
@@ -116,16 +116,16 @@ public class Niveau {
         putElement(i, j, ' ');
     }    
     void ajouteMur(int i, int j) {
-        putElement(i, j, '#');;
+        putElement(i, j, '#');
     }   
     void ajoutePousseur(int i, int j) {
         putElement(i, j, '@');
     }
     void ajouteCaisse(int i, int j) {
-        putElement(i, j,'$');;
+        putElement(i, j,'$');
     }
     void ajouteBut(int i, int j) {
-        putElement(i, j, '.');;
+        putElement(i, j, '.');
     }
     void ajouteCaisseSurBut(int i, int j) {
         putElement(i, j, '*');
@@ -156,7 +156,7 @@ public class Niveau {
      * @return: the position of the player in the line if it contains the player, null otherwise
      * @note: the player is represented by the character '@'
      */
-    public Point ContainsPlayer(String line) {
+    private Point ContainsPlayer(String line) {
         int index = line.indexOf('@');
         if (-1 != index)
             return new Point(index, 0);
@@ -164,9 +164,10 @@ public class Niveau {
     }
 
 
-    char getElement(int l, int c) {
+    public char getElement(int l, int c) {
         if (!estCaseValide(l, c)) {
-            throw new RuntimeException("Indices d'acces a une case du niveau invalides !");
+            //throw new RuntimeException("Indices d'acces ("+l+", "+c") a une case du niveau invalides !");
+            System.out.println("Indices d'acces ("+l+", "+c+") a une case du niveau invalides !");
         }
         return grille[l][c];
     }
