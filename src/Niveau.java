@@ -60,9 +60,9 @@ public class Niveau {
     }
 
 
-    public void deplaceCaisse(int x, int y, int xCaisse, int yCaisse) {
-        if (!estCaseValide(xCaisse, yCaisse) || !estCaseValide(x, y)) {
-            throw new RuntimeException("Indices d'acces a une case du niveau invalides !");
+    public void deplaceCaisse(Point caseDeplacement, Point caseCaisse) {
+        if (!estCaseValide(caseCaisse) || !estCaseValide(caseDeplacement)) {
+            throw new RuntimeException("1Indices d'acces a une case du niveau invalides !");
         }
         if (aCaisse(xCaisse, yCaisse) || aMur(xCaisse, yCaisse)) {
             throw new RuntimeException("Le deplacement de la caisse est impossible !");
@@ -147,7 +147,9 @@ public class Niveau {
         return this.positionJoueur;
     }                   
 
-    boolean estCaseValide(int l, int c) {
+    boolean estCaseValide(Point caseGrille) {
+        int l = caseGrille.x;
+        int c = caseGrille.y;
         return (l>=0 && c>=0) && (l<grille.length && c<grille[l].length);
     }
 
@@ -164,32 +166,34 @@ public class Niveau {
     }
 
 
-    char getElement(int l, int c) {
-        if (!estCaseValide(l, c)) {
+    char getElement(Point caseGrille) {
+        int l = caseGrille.x;
+        int c = caseGrille.y;
+        if (!estCaseValide(caseGrille)) {
             throw new RuntimeException("Indices d'acces a une case du niveau invalides !");
         }
         return grille[l][c];
     }
-    boolean estVide(int l, int c) {
-        return ' ' == getElement(l, c);
+    boolean estVide(Point caseGrille) {
+        return ' ' == getElement(caseGrille);
     }  
-    boolean aMur(int l, int c) {
-        return '#' == getElement(l, c);
+    boolean aMur(Point caseGrille) {
+        return '#' == getElement(caseGrille);
     }
-    boolean aBut(int l, int c) {
-        return '.' == getElement(l, c);
+    boolean aBut(Point caseGrille) {
+        return '.' == getElement(caseGrille);
     }
-    boolean aPousseur(int l, int c) {
-        return '@' == getElement(l, c);
+    boolean aPousseur(Point caseGrille) {
+        return '@' == getElement(caseGrille);
     }
-    boolean aCaisse(int l, int c) {
-        return '$' == getElement(l, c);
+    boolean aCaisse(Point caseGrille) {
+        return '$' == getElement(caseGrille);
     }  
-    boolean aCaisseSurBut(int l, int c) {
-        return '*' == getElement(l, c);
+    boolean aCaisseSurBut(Point caseGrille) {
+        return '*' == getElement(caseGrille);
     }
-    boolean aPousseurSurBut(int l, int c) {
-        return '+' == getElement(l, c);
+    boolean aPousseurSurBut(Point caseGrille) {
+        return '+' == getElement(caseGrille);
     }
 
 }

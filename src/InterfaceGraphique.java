@@ -36,12 +36,12 @@ public class InterfaceGraphique implements Runnable {
 		NiveauGraphique niveauGraphique = new NiveauGraphique(this.jeu);
 
 		// Charge les images des elements
-		niveauGraphique.chargeMure ("../res/Images/Mur.png");
-		niveauGraphique.chargePousseur ("../res/Images/Pousseur.png");
-		niveauGraphique.chargeCaisse ("../res/Images/Caisse.png");
-		niveauGraphique.chargeCaisseSurBut ("../res/Images/Caisse_sur_but.png");
-		niveauGraphique.chargeBut ("../res/Images/But.png");
-		niveauGraphique.chargeSol ("../res/Images/Sol.png");
+		niveauGraphique.chargeMure ("./res/Images/Mur.png");
+		niveauGraphique.chargePousseur ("./res/Images/Pousseur.png");
+		niveauGraphique.chargeCaisse ("./res/Images/Caisse.png");
+		niveauGraphique.chargeCaisseSurBut ("./res/Images/Caisse_sur_but.png");
+		niveauGraphique.chargeBut ("./res/Images/But.png");
+		niveauGraphique.chargeSol ("./res/Images/Sol.png");
 
 		// Ajout de notre composant de dessin dans la fenetre
 		frame.add(niveauGraphique);
