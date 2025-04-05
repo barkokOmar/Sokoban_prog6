@@ -67,69 +67,81 @@ class NiveauGraphique extends JComponent {
 	public void fixePositionDeDeplacement(int x, int y) {
 		this.positionDeDeplacement = new Point(x, y);
 	}
-
+    public Point coord2indice(int x, int y) {// Convertit les coordonnées de la souris en indice de la grille
+        int width = getSize().width;
+        int height = getSize().height;
+        int lignesNiveau = jeu.niveau().lignes();
+        int colonnesNiveau = jeu.niveau().colonnes();
+        int widthImage = width / colonnesNiveau;
+        int heightImage = height / lignesNiveau;
+        int l = y / heightImage;
+        int c = x / widthImage;
+        return new Point(l, c);
+    }
     protected void paintElement(Graphics2D drawable, int l, int c, int x, int y, int width, int height) {
         Niveau niveau = this.jeu.niveau();
-
-        if (niveau.estVide(l, c)) {
+        Point caseGrille = new Point(l, c);
+        if (niveau.estVide(caseGrille)) {
             // Waits for image pixels to finish changing
             while(!drawable.drawImage(floorImage, x, y, width, height, null)) {}
 
-        } else if (niveau.aMur(l, c)) {
+        } else if (niveau.aMur(caseGrille)) {
             while (!drawable.drawImage(wallImage, x, y, width, height, null)) {}
 
-        } else if (niveau.aBut(l, c)) {
+        } else if (niveau.aBut(caseGrille)) {
             while(!drawable.drawImage(floorImage, x, y, width, height, null)) {}
             while(!drawable.drawImage(goalImage, x, y, width, height, null)) {}
 
-        } else if (niveau.aPousseur(l, c)) { // On charge le floor puis le joueur dessus
+        } else if (niveau.aPousseur(caseGrille)) { // On charge le floor puis le joueur dessus
             while(!drawable.drawImage(floorImage, x, y, width, height, null)) {}
             while(!drawable.drawImage(playerImage, x, y, width, height, null)) {}
 
-        } else if (niveau.aCaisse(l, c)) {
+        } else if (niveau.aCaisse(caseGrille)) {
             while(!drawable.drawImage(boxImage, x, y, width, height, null)) {}
 
-        } else if (niveau.aCaisseSurBut(l, c)) {
+        } else if (niveau.aCaisseSurBut(caseGrille)) {
             while(!drawable.drawImage(boxOnGoalImage, x, y, width, height, null)) {}
 
-		} else if (niveau.aPousseurSurBut(l, c)) {
+		} else if (niveau.aPousseurSurBut(caseGrille)) {
             while(!drawable.drawImage(floorImage, x, y, width, height, null)) {}
 			while(!drawable.drawImage(goalImage, x, y, width, height, null)) {}
 			while(!drawable.drawImage(playerImage, x, y, width, height, null)) {}
 
 		} else {
-            throw new RuntimeException("Element '"+niveau.getElement(l, c)+"' a dessiner non recconue");
+            throw new RuntimeException("Element '"+niveau.getElement(caseGrille)+"' a dessiner non recconue");
         }
     }
 
-    private void realiseDeplacementDansNiveau(Niveau niveau, int ImageWidth, int ImageHeight) {
-        int x = this.positionDeDeplacement.x / ImageHeight;
-        int y = this.positionDeDeplacement.y / ImageWidth;
-        int xJoueur = niveau.positionJoueur().x;
-        int yJoueur = niveau.positionJoueur().y;
-        int dx = x - xJoueur;
-        int dy = y - yJoueur;
-        int xCaisse = x + dx;
-        int yCaisse = y + dy;
+    private void realiseDeplacementDansNiveau(Niveau niveau) {
 
-        if (!estCaseAdjacente(x, y, xJoueur, yJoueur)) {
-            System.out.println("Le joueur ne peut se deplacer que d'une case a la fois !");
+        Point caseDeplacement = coord2indice(this.positionDeDeplacement.x, this.positionDeDeplacement.y);
+        int dx = caseDeplacement.x - niveau.positionJoueur().x;
+        int dy = caseDeplacement.y - niveau.positionJoueur().y;
+        Point caseCaisse = new Point(caseDeplacement.x + dx, caseDeplacement.y + dy);
+        Point caseJoueur = niveau.positionJoueur();
+        System.out.println("Deplacement du joueur de ("+caseJoueur.x+","+caseJoueur.y+") a ("+caseDeplacement.x+","+caseDeplacement.y+")");
+        if (!estCaseAdjacente(caseDeplacement, caseJoueur)) {
+            System.out.println("Deplacement impossible !\n");
+            return;
+        } 
+        System.out.println("Deplace la caisse à ("+caseCaisse.x+","+caseCaisse.y+") deplace joueur à ("+caseDeplacement.x+","+caseDeplacement.y+")");
+        if (niveau.aCaisse(caseDeplacement) && (niveau.estVide(caseCaisse) || niveau.aBut(caseCaisse)) ) {
+            niveau.deplaceCaisse(caseDeplacement, caseCaisse);
         }
-        if (niveau.aCaisse(x, y) && (niveau.estVide(xCaisse, yCaisse) || niveau.aBut(xCaisse, yCaisse)) ) {
-            niveau.deplaceCaisse(x, y, xCaisse, yCaisse);
-        }
-		if (niveau.estVide(x, y) || niveau.aBut(x, y)) {	// Si jamais y avait une caisse sur la nouvelle position du joueur, elle a déjà été déplacée (effet de bord de deplaceCaisse) et l'enciennne position de la caisse sera donc vide
-            niveau.deplaceJoueur(x, y);
+		if (niveau.estVide(caseDeplacement) || niveau.aBut(caseDeplacement)) {	// Si jamais y avait une caisse sur la nouvelle position du joueur, elle a déjà été déplacée (effet de bord de deplaceCaisse) et l'enciennne position de la caisse sera donc vide
+            niveau.deplaceJoueur(caseDeplacement);
         } else {
-            System.out.println("Mouvement invalide !");
+            System.out.println("Deplacement impossible !\n");
         }
 		this.positionDeDeplacement = null;
     }
 
-    private boolean estCaseAdjacente(int x1, int y1, int x2, int y2) {
-        return (Math.abs(x1 - x2) < 1 && y1 == y2) || (Math.abs(y1 - y2) == 1 && x1 == x2);
+    private boolean estCaseAdjacente(Point caseDeplacement, Point caseJoueur) {
+        return (caseDeplacement.x == caseJoueur.x && caseDeplacement.y == caseJoueur.y+1) || 
+        (caseDeplacement.x == caseJoueur.x && caseDeplacement.y == caseJoueur.y-1) || 
+        (caseDeplacement.x == caseJoueur.x+1 && caseDeplacement.y == caseJoueur.y) || 
+        (caseDeplacement.x == caseJoueur.x-1 && caseDeplacement.y == caseJoueur.y);
     }
-    
 	@Override
 	public void paintComponent(Graphics g) {
         if (!allElementImagesCharged()) {
@@ -159,8 +171,7 @@ class NiveauGraphique extends JComponent {
 
 		// Un click est detectee
 		if (null != positionDeDeplacement)
-			realiseDeplacementDansNiveau(niveau, widthImage, heightImage);
-        positionDeDeplacement = null;
+			realiseDeplacementDansNiveau(niveau);
     
 
         // On dessine la grille

@@ -26,7 +26,7 @@ public class Niveau {
         this.lignes = grille.length;
         Point p;
         for (int i = 0; i < grille.length; i++) {
-            p = ContainsPlayer(new String(grille[i]));
+            p = ContainsPlayer(new String(grille[i]), i);
             if (null != p) {
                 this.positionJoueur = new Point(p);
             }
@@ -40,7 +40,7 @@ public class Niveau {
         Point p;
         for (String line : level_lines) {
             this.grille[i] = line.toCharArray();
-            p = ContainsPlayer(line);
+            p = ContainsPlayer(line, i);
             if (null != p) {
                 this.positionJoueur = new Point(p);
             }
@@ -60,38 +60,38 @@ public class Niveau {
     }
 
 
-    public void deplaceCaisse(int x, int y, int xCaisse, int yCaisse) {
-        if (!estCaseValide(xCaisse, yCaisse) || !estCaseValide(x, y)) {
-            throw new RuntimeException("Indices d'acces a une case du niveau invalides !");
+    public void deplaceCaisse(Point caseDeplacement, Point caseCaisse) {
+        if (!estCaseValide(caseCaisse) || !estCaseValide(caseDeplacement)) {
+            System.out.println("Indices d'acces a une case du niveau invalides !");
         }
-        if (aCaisse(xCaisse, yCaisse) || aMur(xCaisse, yCaisse)) {
-            throw new RuntimeException("Le deplacement de la caisse est impossible !");
+        if (aCaisse(caseCaisse) || aMur(caseCaisse)) {
+            System.out.println("Le deplacement de la caisse est impossible !");
         }
-        if (!aCaisse(x, y)) {
-            throw new RuntimeException("Il n'y a pas de caisse a deplacer !");
+        if (!aCaisse(caseDeplacement)) {
+            System.out.println("Il n'y a pas de caisse a deplacer !");
         }
-        if (aBut(xCaisse, yCaisse)) {
-            ajouteCaisseSurBut(xCaisse, yCaisse);
+        if (aBut(caseCaisse)) {
+            ajouteCaisseSurBut(caseCaisse.x, caseCaisse.y);
         } else {
-            ajouteCaisse(xCaisse, yCaisse);
+            ajouteCaisse(caseCaisse.x, caseCaisse.y);
         }
-        videCase(x, y);
+        videCase(caseDeplacement.x, caseDeplacement.y);
     }
 
-    public void deplaceJoueur(int x, int y) {
-        if (!estCaseValide(x, y)) {
-            throw new RuntimeException("Erreur deplaceJoueur: position de deplacement invalide !");
+    public void deplaceJoueur(Point caseDeplacement) {
+        if (!estCaseValide(caseDeplacement)) {
+            System.out.println("Erreur deplaceJoueur: position de deplacement invalide !");
         }
-        if (!estVide(x, y) && !aBut(x, y)) {
-            throw new RuntimeException("Erreur deplaceJoueur: position de deplacement est occupee !");
+        if (!estVide(caseDeplacement) && !aBut(caseDeplacement)) {
+            System.out.println("Erreur deplaceJoueur: position de deplacement est occupee !");
         }
-        if (aBut(x, y)) {
-            ajoutePousseurSurBut(x, y);
+        if (aBut(caseDeplacement)) {
+            ajoutePousseurSurBut(caseDeplacement.x, caseDeplacement.y);
         } else {
-            ajoutePousseur(x, y);
+            ajoutePousseur(caseDeplacement.x, caseDeplacement.y);
         }
         videCase(positionJoueur.x, positionJoueur.y);
-        fixePositionJoueur(x, y);
+        fixePositionJoueur(caseDeplacement);
     }
             
     
@@ -106,7 +106,8 @@ public class Niveau {
     }
 
     private void putElement(int i, int j, char c) {
-        if (!estCaseValide(i, j)) {
+        Point caseDeplacement = new Point(i, j);
+        if (!estCaseValide(caseDeplacement)) {
             throw new RuntimeException("Erreur putElement: indices invalides !");
         }
         this.grille[i][j] = c;
@@ -147,7 +148,9 @@ public class Niveau {
         return this.positionJoueur;
     }                   
 
-    boolean estCaseValide(int l, int c) {
+    boolean estCaseValide(Point caseGrille) {
+        int l = caseGrille.x;
+        int c = caseGrille.y;
         return (l>=0 && c>=0) && (l<grille.length && c<grille[l].length);
     }
 
@@ -156,41 +159,43 @@ public class Niveau {
      * @return: the position of the player in the line if it contains the player, null otherwise
      * @note: the player is represented by the character '@'
      */
-    private Point ContainsPlayer(String line) {
+    public Point ContainsPlayer(String line, int i) {
         int index = line.indexOf('@');
         if (-1 != index)
-            return new Point(index, 0);
+            return new Point(i, index);
         return null;
     }
 
 
-    public char getElement(int l, int c) {
-        if (!estCaseValide(l, c)) {
-            //throw new RuntimeException("Indices d'acces ("+l+", "+c") a une case du niveau invalides !");
-            System.out.println("Indices d'acces ("+l+", "+c+") a une case du niveau invalides !");
+    char getElement(Point caseGrille) {
+        int l = caseGrille.x;
+        int c = caseGrille.y;
+        if (!estCaseValide(caseGrille)) {
+            //throw new RuntimeException("Indices d'acces a une case du niveau invalides !");
+            System.out.println("Indices d'acces a une case du niveau invalides !");
         }
         return grille[l][c];
     }
-    boolean estVide(int l, int c) {
-        return ' ' == getElement(l, c);
+    boolean estVide(Point caseGrille) {
+        return ' ' == getElement(caseGrille);
     }  
-    boolean aMur(int l, int c) {
-        return '#' == getElement(l, c);
+    boolean aMur(Point caseGrille) {
+        return '#' == getElement(caseGrille);
     }
-    boolean aBut(int l, int c) {
-        return '.' == getElement(l, c);
+    boolean aBut(Point caseGrille) {
+        return '.' == getElement(caseGrille);
     }
-    boolean aPousseur(int l, int c) {
-        return '@' == getElement(l, c);
+    boolean aPousseur(Point caseGrille) {
+        return '@' == getElement(caseGrille);
     }
-    boolean aCaisse(int l, int c) {
-        return '$' == getElement(l, c);
+    boolean aCaisse(Point caseGrille) {
+        return '$' == getElement(caseGrille);
     }  
-    boolean aCaisseSurBut(int l, int c) {
-        return '*' == getElement(l, c);
+    boolean aCaisseSurBut(Point caseGrille) {
+        return '*' == getElement(caseGrille);
     }
-    boolean aPousseurSurBut(int l, int c) {
-        return '+' == getElement(l, c);
+    boolean aPousseurSurBut(Point caseGrille) {
+        return '+' == getElement(caseGrille);
     }
 
 }
