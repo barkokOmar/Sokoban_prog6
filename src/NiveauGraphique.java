@@ -80,54 +80,51 @@ class NiveauGraphique extends JComponent {
     }
     protected void paintElement(Graphics2D drawable, int l, int c, int x, int y, int width, int height) {
         Niveau niveau = this.jeu.niveau();
-
-        if (niveau.estVide(l, c)) {
+        Point caseGrille = new Point(l, c);
+        if (niveau.estVide(caseGrille)) {
             // Waits for image pixels to finish changing
             while(!drawable.drawImage(floorImage, x, y, width, height, null)) {}
 
-        } else if (niveau.aMur(l, c)) {
+        } else if (niveau.aMur(caseGrille)) {
             while (!drawable.drawImage(wallImage, x, y, width, height, null)) {}
 
-        } else if (niveau.aBut(l, c)) {
+        } else if (niveau.aBut(caseGrille)) {
             while(!drawable.drawImage(floorImage, x, y, width, height, null)) {}
             while(!drawable.drawImage(goalImage, x, y, width, height, null)) {}
 
-        } else if (niveau.aPousseur(l, c)) { // On charge le floor puis le joueur dessus
+        } else if (niveau.aPousseur(caseGrille)) { // On charge le floor puis le joueur dessus
             while(!drawable.drawImage(floorImage, x, y, width, height, null)) {}
             while(!drawable.drawImage(playerImage, x, y, width, height, null)) {}
 
-        } else if (niveau.aCaisse(l, c)) {
+        } else if (niveau.aCaisse(caseGrille)) {
             while(!drawable.drawImage(boxImage, x, y, width, height, null)) {}
 
-        } else if (niveau.aCaisseSurBut(l, c)) {
+        } else if (niveau.aCaisseSurBut(caseGrille)) {
             while(!drawable.drawImage(boxOnGoalImage, x, y, width, height, null)) {}
 
-		} else if (niveau.aPousseurSurBut(l, c)) {
+		} else if (niveau.aPousseurSurBut(caseGrille)) {
             while(!drawable.drawImage(floorImage, x, y, width, height, null)) {}
 			while(!drawable.drawImage(goalImage, x, y, width, height, null)) {}
 			while(!drawable.drawImage(playerImage, x, y, width, height, null)) {}
 
 		} else {
-            throw new RuntimeException("Element '"+niveau.getElement(l, c)+"' a dessiner non recconue");
+            throw new RuntimeException("Element '"+niveau.getElement(caseGrille)+"' a dessiner non recconue");
         }
     }
 
     private void realiseDeplacementDansNiveau(Niveau niveau) {
-        int x = this.positionDeDeplacement.x;
-        int y = this.positionDeDeplacement.y;
-        int xJoueur = niveau.positionJoueur().x;
-        int yJoueur = niveau.positionJoueur().y;
-        int dx = x - xJoueur;
-        int dy = y - yJoueur;
-        int xCaisse = x + dx;
-        int yCaisse = y + dy;
-        Point caseDeplacement = coord2indice(x, y);
-        Point caseCaisse = coord2indice(xCaisse, yCaisse);
-        Point caseJoueur = niveau.positionJoueur();
 
+        Point caseDeplacement = coord2indice(this.positionDeDeplacement.x, this.positionDeDeplacement.y);
+        int dx = caseDeplacement.x - niveau.positionJoueur().x;
+        int dy = caseDeplacement.y - niveau.positionJoueur().y;
+        Point caseCaisse = new Point(caseDeplacement.x + dx, caseDeplacement.y + dy);
+        Point caseJoueur = niveau.positionJoueur();
+        System.out.println("Deplacement du joueur de ("+caseJoueur.x+","+caseJoueur.y+") a ("+caseDeplacement.x+","+caseDeplacement.y+")");
         if (!estCaseAdjacente(caseDeplacement, caseJoueur)) {
             System.out.println("Deplacement impossible !\n");
-        }
+            return;
+        } 
+        System.out.println("Deplace la caisse à ("+caseCaisse.x+","+caseCaisse.y+") deplace joueur à ("+caseDeplacement.x+","+caseDeplacement.y+")");
         if (niveau.aCaisse(caseDeplacement) && (niveau.estVide(caseCaisse) || niveau.aBut(caseCaisse)) ) {
             niveau.deplaceCaisse(caseDeplacement, caseCaisse);
         }
