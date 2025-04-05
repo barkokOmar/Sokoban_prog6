@@ -13,6 +13,7 @@ class NiveauGraphique extends JComponent {
     Image goalImage;
     Image floorImage;
     Point positionDeDeplacement;
+    Point directionDeDeplacement;
 
     public NiveauGraphique() {
         this.jeu = new Jeu();
@@ -113,19 +114,28 @@ class NiveauGraphique extends JComponent {
     }
 
     private void realiseDeplacementDansNiveau(Niveau niveau) {
+        Point caseJoueur = niveau.positionJoueur();
+        Point caseDeplacement;
 
-        Point caseDeplacement = coord2indice(this.positionDeDeplacement.x, this.positionDeDeplacement.y);
+        if (null != positionDeDeplacement) { // Clique souris
+            caseDeplacement = coord2indice(this.positionDeDeplacement.x, this.positionDeDeplacement.y);
+        } else if (null != directionDeDeplacement) { // Touche clavier
+            caseDeplacement = new Point(directionDeDeplacement.x + caseJoueur.x, directionDeDeplacement.y + caseJoueur.y);
+        } else {
+            return; // Pas de deplacement : ne devrait pas arriver
+        }
+
         int dx = caseDeplacement.x - niveau.positionJoueur().x;
         int dy = caseDeplacement.y - niveau.positionJoueur().y;
         Point caseCaisse = new Point(caseDeplacement.x + dx, caseDeplacement.y + dy);
-        Point caseJoueur = niveau.positionJoueur();
+
         System.out.println("Deplacement du joueur de ("+caseJoueur.x+","+caseJoueur.y+") a ("+caseDeplacement.x+","+caseDeplacement.y+")");
         if (!estCaseAdjacente(caseDeplacement, caseJoueur)) {
             System.out.println("Deplacement impossible !\n");
             return;
         } 
         System.out.println("Deplace la caisse à ("+caseCaisse.x+","+caseCaisse.y+") deplace joueur à ("+caseDeplacement.x+","+caseDeplacement.y+")");
-        if (niveau.aCaisse(caseDeplacement) && (niveau.estVide(caseCaisse) || niveau.aBut(caseCaisse)) ) {
+        if ((niveau.aCaisseSurBut(caseDeplacement) || niveau.aCaisse(caseDeplacement)) && (niveau.estVide(caseCaisse) || niveau.aBut(caseCaisse)) ) {
             niveau.deplaceCaisse(caseDeplacement, caseCaisse);
         }
 		if (niveau.estVide(caseDeplacement) || niveau.aBut(caseDeplacement)) {	// Si jamais y avait une caisse sur la nouvelle position du joueur, elle a déjà été déplacée (effet de bord de deplaceCaisse) et l'enciennne position de la caisse sera donc vide
@@ -168,11 +178,13 @@ class NiveauGraphique extends JComponent {
         // On calcule quel sera la taille du rectangle de chaque element du Niveau
         int widthImage = width / colonnesNiveau;
         int heightImage = height / lignesNiveau;
-
-		// Un click est detectee
-		if (null != positionDeDeplacement)
-			realiseDeplacementDansNiveau(niveau);
     
+		// Un click/touche est detectee
+		if (null != positionDeDeplacement || null != directionDeDeplacement) {
+			realiseDeplacementDansNiveau(niveau);
+        }
+        positionDeDeplacement = null;
+        directionDeDeplacement = null;
 
         // On dessine la grille
         for (int i = 0; i < lignesNiveau; i++) {

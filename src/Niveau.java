@@ -63,35 +63,72 @@ public class Niveau {
     public void deplaceCaisse(Point caseDeplacement, Point caseCaisse) {
         if (!estCaseValide(caseCaisse) || !estCaseValide(caseDeplacement)) {
             System.out.println("Indices d'acces a une case du niveau invalides !");
+            return;
         }
         if (aCaisse(caseCaisse) || aMur(caseCaisse)) {
             System.out.println("Le deplacement de la caisse est impossible !");
+            return;
         }
-        if (!aCaisse(caseDeplacement)) {
-            System.out.println("Il n'y a pas de caisse a deplacer !");
+        if (!aCaisse(caseDeplacement) && !aCaisseSurBut(caseDeplacement)) {
+            System.out.println("La case de deplacement n'est pas occupee par une caisse !");
+            return;
         }
         if (aBut(caseCaisse)) {
             ajouteCaisseSurBut(caseCaisse.x, caseCaisse.y);
         } else {
             ajouteCaisse(caseCaisse.x, caseCaisse.y);
         }
-        videCase(caseDeplacement.x, caseDeplacement.y);
+        // La case de deplacement redevient vide (ou un but)
+        if (aCaisseSurBut(caseDeplacement)) {
+            ajouteBut(caseDeplacement.x, caseDeplacement.y);
+        } else {
+            videCase(caseDeplacement.x, caseDeplacement.y);
+        }
     }
 
     public void deplaceJoueur(Point caseDeplacement) {
         if (!estCaseValide(caseDeplacement)) {
-            System.out.println("Erreur deplaceJoueur: position de deplacement invalide !");
+            System.out.println("Erreur deplaceJoueur: indices invalides !");
+            return;
+        }
+        if (aMur(caseDeplacement)) {
+            System.out.println("Erreur deplaceJoueur: Le joueur ne peut pas rentrer dans un mur!");
+            return;
+        }
+        if (aCaisse(caseDeplacement) || aCaisseSurBut(caseDeplacement)) {
+            System.out.println("Erreur deplaceJoueur: La case de deplacement est occupe par une caisse (faut la pousser...)!");
+            return;
         }
         if (!estVide(caseDeplacement) && !aBut(caseDeplacement)) {
-            System.out.println("Erreur deplaceJoueur: position de deplacement est occupee !");
+            System.out.println("Erreur deplaceJoueur: position de deplacement est occupee par un obstacle ?!");
+            return;
         }
+
         if (aBut(caseDeplacement)) {
             ajoutePousseurSurBut(caseDeplacement.x, caseDeplacement.y);
         } else {
             ajoutePousseur(caseDeplacement.x, caseDeplacement.y);
         }
-        videCase(positionJoueur.x, positionJoueur.y);
+        // La case de deplacement redevient vide (ou un but)
+        if (aPousseurSurBut(positionJoueur)) {
+            ajouteBut(positionJoueur.x, positionJoueur.y);
+        } else {
+            videCase(positionJoueur.x, positionJoueur.y);
+        }
         fixePositionJoueur(caseDeplacement);
+    }
+    public void deplaceJoueur(String direction) {
+        if ("haut" == direction) {
+            deplaceJoueur(new Point(positionJoueur.x-1, positionJoueur.y));
+        } else if ("bas" == direction) {
+            deplaceJoueur(new Point(positionJoueur.x+1, positionJoueur.y));
+        } else if ("gauche" == direction) {
+            deplaceJoueur(new Point(positionJoueur.x, positionJoueur.y-1));
+        } else if ("droite" == direction) {
+            deplaceJoueur(new Point(positionJoueur.x, positionJoueur.y+1));
+        } else {
+            System.out.println("Erreur deplaceJoueur: direction de deplacement invalide!");
+        }
     }
             
     

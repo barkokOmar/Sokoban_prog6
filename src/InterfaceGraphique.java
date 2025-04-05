@@ -46,10 +46,17 @@ public class InterfaceGraphique implements Runnable {
 		// Ajout de notre composant de dessin dans la fenetre
 		frame.add(niveauGraphique);
 		
-		EcouteurDeSouris mouseListener = new EcouteurDeSouris(niveauGraphique);
-
 		// Ajout d'un mouse listener
+		EcouteurDeSouris mouseListener = new EcouteurDeSouris(niveauGraphique);
 		niveauGraphique.addMouseListener(mouseListener);
+
+		// Ajout d'un key listener
+		EcouteurDeClavier keyListener = new EcouteurDeClavier(niveauGraphique);
+		niveauGraphique.addKeyListener(keyListener);
+
+		// Assurez-vous que le composant est focusable pour recevoir les événements clavier
+		niveauGraphique.setFocusable(true);
+		niveauGraphique.requestFocusInWindow();
 
 		// Un clic sur le bouton de fermeture clos l'application
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
