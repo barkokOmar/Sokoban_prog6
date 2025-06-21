@@ -1,5 +1,5 @@
 import Global.Configuration;
- import java.io.InputStream;
+import java.io.InputStream;
 import javax.swing.*;
 
 public class EssaiGUI {

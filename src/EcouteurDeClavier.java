@@ -29,6 +29,7 @@ public class EcouteurDeClavier extends KeyAdapter {
                 niveauGraphique.directionDeDeplacement = new Point(0, 1);
                 break;
             case KeyEvent.VK_A:
+                
             case KeyEvent.VK_Q:
                 System.out.println("Je quitte le jeu");
                 System.exit(0);
