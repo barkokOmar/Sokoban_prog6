@@ -3,4 +3,4 @@
 
 - Pour compiler : exécuter le scripte recompile
 - Pour executer le programme principale java utiliser la commande : 
-java -cp bin EssaiGUI
+java -cp bin Sokoban
